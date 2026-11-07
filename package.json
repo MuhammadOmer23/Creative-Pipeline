@@ -8,7 +8,7 @@
     "start": "next start --hostname 127.0.0.1 --port 3000",
     "typecheck": "tsc --noEmit",
     "db:setup": "tsx scripts/setup-db.ts",
-    "test:unit": "DATABASE_URL=postgres://pipeline:pipeline@127.0.0.1:5432/creative_pipeline_test tsx --test tests/domain.test.ts",
+    "test:unit": "tsx --test tests/domain.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

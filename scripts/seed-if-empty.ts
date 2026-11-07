@@ -14,6 +14,8 @@ async function main() {
     const existing = await client.query("select count(*)::int as n from accounts");
     if (existing.rows[0].n > 0) {
       console.log("seed: accounts already present");
+    } else if (!process.env.FIXTURE_PASSWORD?.trim()) {
+      console.log("seed: skipped, fixture password is not configured");
     } else {
       await seedFixtures(client);
       console.log("seed: fixture accounts added");

@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { getPool } from "../src/server/db";
 import { seedFixtures } from "../src/server/fixtures";
 
-function loadEnvFile() {
+export function loadEnvFile() {
   try {
     const text = readFileSync(".env.local", "utf8");
     for (const line of text.split("\n")) {

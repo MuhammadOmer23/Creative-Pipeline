@@ -14,7 +14,7 @@ const FIXTURES = [
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState(FIXTURES[0][0]);
-  const [password, setPassword] = useState("fixture-only");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   async function submit(event: React.FormEvent) {
@@ -57,7 +57,7 @@ export default function LoginPage() {
           </button>
         ))}
       </div>
-      <p className="muted">Shared fixture password: fixture-only. These are not production accounts.</p>
+      <p className="muted">These are labelled fixture accounts. They are not production accounts. The password is configured for this installation and is not stored in the app.</p>
     </main>
   );
 }

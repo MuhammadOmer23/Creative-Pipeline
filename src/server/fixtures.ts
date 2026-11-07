@@ -1,4 +1,3 @@
-import { FIXTURE_PASSWORD } from "../domain/constants";
 import { contentHash } from "../domain/snapshot";
 import { emptyFindings, emptySnapshot } from "../domain/snapshot";
 import type { Db } from "./db";
@@ -25,7 +24,9 @@ const ACCOUNTS = [
 ] as const;
 
 export async function seedFixtures(db: Db): Promise<void> {
-  const password = hashPassword(FIXTURE_PASSWORD);
+  const configured = process.env.FIXTURE_PASSWORD?.trim() ?? "";
+  if (!configured) throw new Error("FIXTURE_PASSWORD is required to seed fixture accounts.");
+  const password = hashPassword(configured);
   for (const [id, name, email, roles] of ACCOUNTS) {
     await db.query(
       `INSERT INTO accounts (id, name, email, password_hash, is_fixture) VALUES ($1,$2,$3,$4,true)`,
