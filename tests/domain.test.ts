@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "crypto";
+import { randomBytes, randomUUID } from "crypto";
 import { after, before, test } from "node:test";
 import { ANALYSIS_LABELS } from "../src/domain/labels";
 import { IDS } from "../src/server/fixtures";
 import { getPool } from "../src/server/db";
-import { resetDatabase } from "../scripts/setup-db";
+import { loadEnvFile, resetDatabase } from "../scripts/setup-db";
 import {
   acceptHandoff,
   addEvidence,
@@ -35,7 +35,13 @@ const editor: Actor = { id: IDS.editor, name: "Fixture Editor", roles: ["editor"
 const approver: Actor = { id: IDS.approver, name: "Bilal (fixture approver)", roles: ["approver"], fixture: true };
 
 before(async () => {
-  process.env.DATABASE_URL ??= "postgres://pipeline:pipeline@127.0.0.1:5432/creative_pipeline_test";
+  loadEnvFile();
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL is required.");
+  const parsed = new URL(url);
+  parsed.pathname = "/creative_pipeline_test";
+  process.env.DATABASE_URL = parsed.toString();
+  if (!process.env.FIXTURE_PASSWORD?.trim()) process.env.FIXTURE_PASSWORD = randomBytes(18).toString("base64url");
   await resetDatabase();
 });
 

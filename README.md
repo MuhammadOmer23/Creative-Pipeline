@@ -6,7 +6,7 @@ The app does not write to Notion, Drive, or the creative-intelligence sheet. It 
 
 ## Run
 
-Postgres needs a database named `creative_pipeline`. Copy `.env.example` to `.env.local`, then:
+Postgres needs a database named `creative_pipeline`. Copy `.env.example` to `.env.local`, then set `DATABASE_URL` and `FIXTURE_PASSWORD` there. Do not commit `.env.local`.
 
 ```bash
 npm install
@@ -14,7 +14,7 @@ npm run db:setup
 npm run dev
 ```
 
-Open http://127.0.0.1:3000. Fixture accounts use the password `fixture-only`:
+Open http://127.0.0.1:3000. Sign in with a fixture account. The password is the `FIXTURE_PASSWORD` you set locally:
 
 | Email | Role |
 | --- | --- |

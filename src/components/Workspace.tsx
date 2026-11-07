@@ -18,6 +18,24 @@ const SECTIONS = [
 
 type Send = (body: Record<string, unknown>, backupKey?: string, backup?: unknown) => Promise<CreativeDto | null>;
 
+function recorded(value: string): boolean {
+  const text = value.trim();
+  return text.length > 0 && text !== "MISSING" && !text.startsWith("MISSING ");
+}
+
+function sectionState(key: string, dto: CreativeDto, current: string): "Locked" | "Open" | "Done" | "To do" {
+  if (key !== "intake" && !dto.code) return "Locked";
+  if (current === key) return "Open";
+  if (key === "intake" && dto.code) return "Done";
+  if (key === "reference" && dto.reference.reviewedAt) return "Done";
+  if (key === "breakdown" && dto.analysis?.state === "ready") return "Done";
+  if (key === "strategy" && recorded(dto.strategy.concept)) return "Done";
+  if (key === "offer" && recorded(dto.offer.offerPrice) && recorded(dto.offer.landingUrl)) return "Done";
+  if (key === "copy" && dto.copyAuthoredAt) return "Done";
+  if (key === "assets" && dto.assets.some((asset) => recorded(asset.label))) return "Done";
+  return "To do";
+}
+
 export function Workspace({ initial, initialSection }: { initial: CreativeDto; initialSection: string }) {
   const [dto, setDto] = useState(initial);
   const [section, setSection] = useState(SECTIONS.some(([key]) => key === initialSection) ? initialSection : "intake");
@@ -78,15 +96,13 @@ export function Workspace({ initial, initialSection }: { initial: CreativeDto; i
         <div>
           <p className="kicker">{dto.code ?? "Not selected"} · {dto.stageLabel}</p>
           <h2>{dto.intake.idea || "Untitled intake"}</h2>
-          <p>{dto.finalDraftLabel}. {dto.approvalLabel}. Handoff: {dto.handoffLabel}.</p>
-          <p><strong>Next:</strong> {dto.nextAction} <span className="muted">Owner: {dto.owner}</span></p>
         </div>
         <Link className="button secondary" href={`/creatives/${dto.id}/review`}>Review and handoff</Link>
       </header>
       {dto.banner ? <p className="banner" role="status">{dto.banner}</p> : null}
       {dto.blockers[0] ? <p className="note">Blocker: {dto.blockers[0].reason} Owner: {dto.blockers[0].owner}. Blocks: {dto.blockers[0].blocks}.</p> : null}
       {dto.notes.map((note) => <p key={note} className="note">{note}</p>)}
-      <p className={tone === "error" ? "error" : "ok"} role="status" aria-live="polite" data-testid="save-status">{status}</p>
+      <p className={tone === "error" ? "error" : status === "Saved" ? "ok" : "quiet"} role={tone === "error" ? "alert" : "status"} aria-live={tone === "error" ? "assertive" : "polite"} data-testid="save-status">{status}</p>
       {conflict ? (
         <div className="error" data-testid="conflict">
           <p>Someone else saved {conflict}.</p>
@@ -104,13 +120,21 @@ export function Workspace({ initial, initialSection }: { initial: CreativeDto; i
         </div>
       ) : null}
       <div className="layout with-side">
-        <nav className="steps" aria-label="Brief sections">
-          {SECTIONS.map(([key, label]) => (
-            <button key={key} type="button" aria-current={section === key ? "true" : undefined} disabled={key !== "intake" && !dto.code} onClick={() => setSection(key)}>
-              {label}
-            </button>
-          ))}
+        <div className="side">
+          {!dto.code ? <p id="sections-locked" className="muted">The other sections open after this creative is selected into the pipeline.</p> : null}
+          <nav className="steps" aria-label="Brief sections">
+          {SECTIONS.map(([key, label]) => {
+            const lockedSection = key !== "intake" && !dto.code;
+            const state = sectionState(key, dto, section);
+            return (
+              <button key={key} type="button" aria-current={section === key ? "true" : undefined} disabled={lockedSection} aria-describedby={lockedSection ? "sections-locked" : undefined} onClick={() => setSection(key)}>
+                <span>{label}</span>
+                <span className="step-state" aria-hidden="true">{state}</span>
+              </button>
+            );
+          })}
         </nav>
+        </div>
         <div className="work">
           {section === "intake" ? <Intake dto={dto} send={send} /> : null}
           {section === "reference" ? <Reference dto={dto} send={send} /> : null}
@@ -120,6 +144,13 @@ export function Workspace({ initial, initialSection }: { initial: CreativeDto; i
           {section === "copy" ? <CopyForm dto={dto} send={send} /> : null}
           {section === "assets" ? <Assets dto={dto} send={send} /> : null}
         </div>
+        <aside className="status-rail" aria-label="Creative status">
+          <p className="kicker">Status</p>
+          <p>{dto.finalDraftLabel}. {dto.approvalLabel}.</p>
+          <p>Handoff: {dto.handoffLabel}.</p>
+          <p><strong>Next:</strong> {dto.nextAction}</p>
+          <p className="muted">Owner: {dto.owner}</p>
+        </aside>
       </div>
     </div>
   );

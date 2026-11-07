@@ -5,8 +5,6 @@ export const HANDOFF_DISCLAIMER =
 
 export const MISSING_THRESHOLD = "MISSING until approved source";
 
-export const FIXTURE_PASSWORD = "fixture-only";
-
 export const ROLES = [
   "strategist",
   "copy_writer",
