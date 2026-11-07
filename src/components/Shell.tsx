@@ -1,32 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Shell({ name, role, children }: { name: string; role: string; children: React.ReactNode }) {
   const router = useRouter();
+  const path = usePathname();
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
     router.refresh();
   }
   return (
-    <div className="shell">
-      <header className="top">
-        <div>
-          <p className="kicker">TriCore</p>
-          <h1><Link href="/pipeline">Creative pipeline</Link></h1>
-          <p className="muted">The final outcome is the final draft.</p>
-        </div>
-        <div className="actions">
+    <div className="app">
+      <aside className="rail">
+        <p className="brand">TriCore</p>
+        <h1 className="brand-name">Creative pipeline</h1>
+        <nav aria-label="Workspace">
+          <Link href="/pipeline" aria-current={path.startsWith("/pipeline") ? "page" : undefined}>Pipeline</Link>
+        </nav>
+        <p className="rail-note">The final outcome is the final draft.</p>
+      </aside>
+      <div className="frame">
+        <header className="bar">
           <p className="who">{name} · {role}</p>
           <button type="button" className="secondary" onClick={logout}>Log out</button>
-        </div>
-      </header>
-      <main id="main">{children}</main>
-      <footer>
-        Approval of a blank template is not approval of a brief. Editor acceptance does not authorize production, publishing, or ad spend.
-      </footer>
+        </header>
+        <main id="main">{children}</main>
+        <footer>
+          Approval of a blank template is not approval of a brief. Editor acceptance does not authorize production, publishing, or ad spend.
+        </footer>
+      </div>
     </div>
   );
 }

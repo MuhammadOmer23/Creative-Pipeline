@@ -33,14 +33,22 @@ export function Review({ initial }: { initial: CreativeDto }) {
     setMessage("Saved");
   }
 
+  const checks = [...dto.checks].sort((a, b) => {
+    const rank = (check: typeof a) => (check.result === "fail" ? 0 : check.stale ? 1 : check.result === "pass" ? 2 : 3);
+    return rank(a) - rank(b);
+  });
+
   return (
-    <div data-launch-controls="none">
+    <div className="decision" data-launch-controls="none">
+      <div>
       <p><Link href={`/creatives/${dto.id}`}>Back to the brief</Link></p>
-      <header>
-        <p className="kicker">{dto.code ?? "Not selected"}</p>
-        <h2 data-testid="final-draft">{dto.finalDraftLabel}</h2>
-        <p>{dto.approvalLabel}. Handoff: {dto.handoffLabel}.</p>
-        <p><strong>Next:</strong> {dto.nextAction}</p>
+      <header className="top">
+        <div>
+          <p className="kicker">{dto.code ?? "Not selected"}</p>
+          <h2 data-testid="final-draft">{dto.finalDraftLabel}</h2>
+          <p>{dto.approvalLabel}. Handoff: {dto.handoffLabel}.</p>
+          <p><strong>Next:</strong> {dto.nextAction}</p>
+        </div>
       </header>
       {dto.banner ? <p className="banner">{dto.banner}</p> : null}
       {error ? <p className="error" role="alert">{error}</p> : null}
@@ -65,8 +73,8 @@ export function Review({ initial }: { initial: CreativeDto }) {
 
       <section>
         <h3>Checklist</h3>
-        {dto.checks.length ? dto.checks.map((check) => (
-          <div key={check.key} className="check">
+        {checks.length ? checks.map((check) => (
+          <div key={check.key} className="check" data-result={check.stale ? "stale" : check.result}>
             <strong>{check.stale ? "Stale" : check.result === "pass" ? "Pass" : check.result === "fail" ? "Fail" : "N/A"}</strong>
             <div>
               <p>{check.title}</p>
@@ -85,6 +93,8 @@ export function Review({ initial }: { initial: CreativeDto }) {
         ) : null}
       </section>
 
+      </div>
+      <aside className="decision-rail">
       <section>
         <h3>Approval</h3>
         <p className="muted">Approving this exact version makes it the final draft. It does not approve production, publishing, or spend.</p>
@@ -143,7 +153,8 @@ export function Review({ initial }: { initial: CreativeDto }) {
         ) : null}
       </section>
 
-      <section>
+      </aside>
+      <section className="history">
         <h3>History</h3>
         <ul>{dto.history.map((item) => <li key={item.id}>{item.at} · {item.actorName} · {item.sentence}</li>)}</ul>
       </section>

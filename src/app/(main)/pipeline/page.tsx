@@ -67,11 +67,18 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
         </label>
         <button type="submit" className="secondary">Filter</button>
       </form>
-      <div className="cards">
+      <div className="cards" role="table" aria-label="Creatives">
+        <div className="table-head" role="row">
+          <span>Creative</span>
+          <span>Stage</span>
+          <span>Next action</span>
+          <span>Blocker</span>
+          <span>Final draft</span>
+        </div>
         {cards.map((card) => (
-          <article key={card.id} className="card" data-testid="creative-card">
+          <article key={card.id} className="card" data-testid="creative-card" role="row">
+            {card.banner ? <p className="banner">{card.banner}</p> : null}
             <div>
-              {card.banner ? <p className="banner">{card.banner}</p> : null}
               <p className="kicker">{card.code ?? "No pipeline ID"}</p>
               <h3><Link href={`/creatives/${card.id}`}>{card.intake.idea || "Untitled intake"}</Link></h3>
             </div>
