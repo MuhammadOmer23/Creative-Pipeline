@@ -86,7 +86,7 @@ export function Workspace({ initial, initialSection }: { initial: CreativeDto; i
       {dto.banner ? <p className="banner" role="status">{dto.banner}</p> : null}
       {dto.blockers[0] ? <p className="note">Blocker: {dto.blockers[0].reason} Owner: {dto.blockers[0].owner}. Blocks: {dto.blockers[0].blocks}.</p> : null}
       {dto.notes.map((note) => <p key={note} className="note">{note}</p>)}
-      <p className={tone === "error" ? "error" : "ok"} role="status" aria-live="polite" data-testid="save-status">{status}</p>
+      <p className={tone === "error" ? "error" : status === "Saved" ? "ok" : "quiet"} role={tone === "error" ? "alert" : "status"} aria-live={tone === "error" ? "assertive" : "polite"} data-testid="save-status">{status}</p>
       {conflict ? (
         <div className="error" data-testid="conflict">
           <p>Someone else saved {conflict}.</p>
@@ -104,13 +104,19 @@ export function Workspace({ initial, initialSection }: { initial: CreativeDto; i
         </div>
       ) : null}
       <div className="layout with-side">
-        <nav className="steps" aria-label="Brief sections">
-          {SECTIONS.map(([key, label]) => (
-            <button key={key} type="button" aria-current={section === key ? "true" : undefined} disabled={key !== "intake" && !dto.code} onClick={() => setSection(key)}>
-              {label}
-            </button>
-          ))}
+        <div className="side">
+          {!dto.code ? <p id="sections-locked" className="muted">The other sections open after this creative is selected into the pipeline.</p> : null}
+          <nav className="steps" aria-label="Brief sections">
+          {SECTIONS.map(([key, label]) => {
+            const lockedSection = key !== "intake" && !dto.code;
+            return (
+              <button key={key} type="button" aria-current={section === key ? "true" : undefined} disabled={lockedSection} aria-describedby={lockedSection ? "sections-locked" : undefined} onClick={() => setSection(key)}>
+                {label}
+              </button>
+            );
+          })}
         </nav>
+        </div>
         <div className="work">
           {section === "intake" ? <Intake dto={dto} send={send} /> : null}
           {section === "reference" ? <Reference dto={dto} send={send} /> : null}

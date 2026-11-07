@@ -40,7 +40,7 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
         </div>
         <NewIntake canCreate={actor.roles.includes("strategist")} />
       </div>
-      <form className="filters" method="get">
+      <form className="filters" method="get" aria-label="Filter creatives">
         <label><span>Search</span><input name="q" defaultValue={one(query.q)} aria-label="Search" /></label>
         <label>
           <span>Stage</span>
@@ -73,7 +73,7 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
             <div>
               {card.banner ? <p className="banner">{card.banner}</p> : null}
               <p className="kicker">{card.code ?? "No pipeline ID"}</p>
-              <h2><Link href={`/creatives/${card.id}`}>{card.intake.idea || "Untitled intake"}</Link></h2>
+              <h3><Link href={`/creatives/${card.id}`}>{card.intake.idea || "Untitled intake"}</Link></h3>
             </div>
             <p className="meta"><span>Stage</span>{card.stageLabel}</p>
             <p className="meta"><span>Next action</span>{card.nextAction} Owner: {card.owner}.</p>
@@ -82,7 +82,7 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
           </article>
         ))}
       </div>
-      {cards.length === 0 ? <p className="muted">No creatives match this filter.</p> : null}
+      {cards.length === 0 ? <p className="muted" role="status">No creatives match this filter.</p> : null}
     </div>
   );
 }

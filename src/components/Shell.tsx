@@ -19,7 +19,7 @@ export function Shell({ name, role, children }: { name: string; role: string; ch
           <p className="muted">The final outcome is the final draft.</p>
         </div>
         <div className="actions">
-          <p>{name} · {role}</p>
+          <p className="who">{name} · {role}</p>
           <button type="button" className="secondary" onClick={logout}>Log out</button>
         </div>
       </header>

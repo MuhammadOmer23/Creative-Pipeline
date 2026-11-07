@@ -35,19 +35,19 @@ export default function LoginPage() {
   }
 
   return (
-    <main id="main" className="shell">
+    <main id="main" className="shell gate">
       <h1>Creative pipeline</h1>
-      <p className="muted">The final outcome is the final draft. This sign-in is for labelled fixture accounts only.</p>
+      <p id="login-note" className="muted">The final outcome is the final draft. This sign-in is for labelled fixture accounts only.</p>
       <form className="work" onSubmit={submit}>
         <div className="field">
           <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          <input id="email" name="email" type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} required aria-describedby="login-note" />
         </div>
         <div className="field">
           <label htmlFor="password">Password</label>
-          <input id="password" name="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          <input id="password" name="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required aria-invalid={error ? true : undefined} aria-describedby={error ? "login-error" : undefined} />
         </div>
-        {error ? <p className="error" role="alert">{error}</p> : null}
+        {error ? <p id="login-error" className="error" role="alert">{error}</p> : null}
         <button type="submit">Sign in</button>
       </form>
       <div className="actions" style={{ marginTop: "1rem" }}>
