@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Board } from "@/components/Board";
 import { NewIntake } from "@/components/Pipeline";
 import { requireActor } from "@/server/current";
 import { listPipeline } from "@/server/service";
@@ -36,7 +36,7 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
       <div className="top">
         <div>
           <h2>Pipeline</h2>
-          <p className="muted">Work in progress, the next action, and who owns it. The final outcome is the final draft.</p>
+          <p className="muted">Scroll across the stages. Each card shows the next action, the blocker, and the final-draft status. A live creative can be dragged to Parked. Every other stage follows the work on the brief.</p>
         </div>
         <NewIntake canCreate={actor.roles.includes("strategist")} />
       </div>
@@ -67,29 +67,9 @@ export default async function PipelinePage({ searchParams }: { searchParams: Pro
         </label>
         <button type="submit" className="secondary">Filter</button>
       </form>
-      <div className="cards" role="table" aria-label="Creatives">
-        <div className="table-head" role="row">
-          <span>Creative</span>
-          <span>Stage</span>
-          <span>Next action</span>
-          <span>Blocker</span>
-          <span>Final draft</span>
-        </div>
-        {cards.map((card) => (
-          <article key={card.id} className="card" data-testid="creative-card" role="row">
-            {card.banner ? <p className="banner">{card.banner}</p> : null}
-            <div>
-              <p className="kicker">{card.code ?? "No pipeline ID"}</p>
-              <h3><Link href={`/creatives/${card.id}`}>{card.intake.idea || "Untitled intake"}</Link></h3>
-            </div>
-            <p className="meta"><span>Stage</span>{card.stageLabel}</p>
-            <p className="meta"><span>Next action</span>{card.nextAction} Owner: {card.owner}.</p>
-            <p className="meta"><span>Blocker</span>{card.blockers[0] ? `${card.blockers[0].reason} Owner: ${card.blockers[0].owner}.` : "None."}</p>
-            <p className="meta"><span>Final draft</span>{card.finalDraftLabel}. {card.handoffLabel}.</p>
-          </article>
-        ))}
-      </div>
-      {cards.length === 0 ? <p className="muted" role="status">No creatives match this filter.</p> : null}
+      {cards.length === 0 ? <p className="muted" role="status">No creatives match this filter.</p> : (
+        <Board cards={cards} stage={stage} canMove={actor.roles.includes("strategist")} />
+      )}
     </div>
   );
 }
